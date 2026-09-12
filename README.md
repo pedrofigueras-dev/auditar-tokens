@@ -138,12 +138,17 @@ no cuenta como deuda; `p-[13px]` sí.
 **Copias idénticas.** Un `styles.css` duplicado en `www/` doblaría todas las cifras del
 informe, así que se cuenta una vez.
 
+**Ejemplos de documentación.** En los `.mdx` se descarta lo que va dentro de una valla de
+código: en un sitio de documentación eso es material didáctico, no el diseño del sitio, y
+si el tutorial está traducido a quince idiomas cada valor de ejemplo se contaría quince
+veces.
+
 ## Qué mira
 
 Hojas de estilo (`.css`, `.scss`, `.sass`, `.less`, `.styl`), marcado y código (`.tsx`,
-`.jsx`, `.ts`, `.js`, `.vue`, `.svelte`, `.astro`, `.html`, `.mdx`), los `style=` en
-línea, los bloques `<style>`, las plantillas de CSS-in-JS, los valores arbitrarios de
-Tailwind y el color dentro de los SVG.
+`.jsx`, `.ts`, `.js`, `.vue`, `.svelte`, `.astro`, `.html`), el `.mdx` fuera de sus
+vallas de código, los `style=` en línea, los bloques `<style>`, las plantillas de
+CSS-in-JS, los valores arbitrarios de Tailwind y el color dentro de los SVG.
 
 En un proyecto con Tailwind la mayor parte del diseño vive en los `className`, no en los
 `.css`. Mirar sólo la hoja de estilos deja ver un tercio.

@@ -177,8 +177,35 @@ function contextoDe(texto, indice, tipo) {
   return RE_DEFINICION.test(texto.slice(inicioLinea, indice)) ? 'definición' : 'suelto';
 }
 
+/**
+ * En un sitio de documentación, el CSS de dentro de una valla de código es
+ * material didáctico, no el diseño del sitio. Y como el mismo tutorial suele
+ * estar traducido a quince idiomas, cada valor de ejemplo se contaría quince
+ * veces. Fuera de la valla sí hay uso real: componentes con sus clases.
+ */
+function sinVallas(md) {
+  const fuera = [];
+  let valla = null;
+  for (const linea of md.split('\n')) {
+    const marca = linea.match(/^[ \t]*(`{3,}|~{3,})/);
+    if (valla) {
+      if (marca && marca[1][0] === valla[0] && marca[1].length >= valla.length) valla = null;
+      continue;
+    }
+    if (marca) {
+      valla = marca[1];
+      continue;
+    }
+    fuera.push(linea);
+  }
+  // El `código en línea` de una frase también es un ejemplo.
+  return fuera.join('\n').replace(/`[^`\n]*`/g, ' ');
+}
+
 /** Todo lo que un archivo aporta a la auditoría. */
-export function extraer(texto, tipo) {
+export function extraer(bruto, tipoBruto) {
+  const tipo = tipoBruto === 'markdown' ? 'codigo' : tipoBruto;
+  const texto = tipoBruto === 'markdown' ? sinVallas(bruto) : bruto;
   const salida = {
     colores: [],
     medidas: [],

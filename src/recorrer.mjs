@@ -14,7 +14,9 @@ const DIRECTORIOS_IGNORADOS = new Set([
 ]);
 
 const ESTILOS = new Set(['.css', '.scss', '.sass', '.less', '.styl', '.pcss']);
-const CODIGO = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.vue', '.svelte', '.astro', '.html', '.mdx']);
+const CODIGO = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.vue', '.svelte', '.astro', '.html']);
+// El markdown lleva ejemplos dentro: hay que quitarlos antes de contar.
+const MARCADO = new Set(['.mdx', '.markdoc']);
 const GRAFICOS = new Set(['.svg']);
 
 // Un archivo generado o minificado dispara el recuento sin aportar nada: son
@@ -27,6 +29,7 @@ export function tipoDe(ruta) {
   const ext = extname(ruta).toLowerCase();
   if (ESTILOS.has(ext)) return 'estilos';
   if (CODIGO.has(ext)) return 'codigo';
+  if (MARCADO.has(ext)) return 'markdown';
   if (GRAFICOS.has(ext)) return 'grafico';
   return null;
 }
