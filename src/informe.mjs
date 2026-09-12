@@ -41,6 +41,39 @@ function escalaDe(valores) {
   }));
 }
 
+/**
+ * Dónde se concentra la deuda, por carpeta. En todos los proyectos reales
+ * aparece lo mismo: tests, plantillas de correo, tutoriales, ejemplos. No son
+ * decisiones de diseño, pero sus nombres de carpeta cambian de proyecto a
+ * proyecto, así que la herramienta no puede excluirlos por su cuenta sin
+ * meterse a decidir. Los enseña, y el alcance lo fija quien audita.
+ */
+function concentracion(porArchivo) {
+  const total = [...porArchivo.values()].reduce((n, v) => n + v, 0);
+  const cuenta = new Map();
+  for (const [ruta, n] of porArchivo) {
+    const partes = ruta.split('/').slice(0, -1);
+    for (let i = 1; i <= partes.length; i++) {
+      const dir = partes.slice(0, i).join('/');
+      cuenta.set(dir, (cuenta.get(dir) || 0) + n);
+    }
+    if (!partes.length) cuenta.set('.', (cuenta.get('.') || 0) + n);
+  }
+  // Si una carpeta aporta casi todo lo de su padre, el padre no dice nada nuevo:
+  // se queda la más profunda de la cadena.
+  const utiles = [...cuenta.entries()].filter(([dir, n]) => {
+    if (n / total < 0.05) return false;
+    // Más de cinco niveles ya no es una carpeta que nadie vaya a excluir
+    // entera: es un archivo concreto con otro nombre.
+    if (dir.split("/").length > 5) return false;
+    for (const [otro, m] of cuenta) {
+      if (otro !== dir && otro.startsWith(dir + '/') && m >= n * 0.7) return false;
+    }
+    return true;
+  });
+  return { total, carpetas: utiles.sort((a, b) => b[1] - a[1]) };
+}
+
 function principales(archivos, n = 3) {
   const lista = [...archivos.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
   const resto = archivos.size - lista.length;
@@ -96,6 +129,24 @@ export function generarInforme(d) {
     L.push(`- ${d.escala.conVariable} consumen una variable (\`px-[var(--card-padding-x)]\`).`);
     L.push(`- **${d.escala.literales} son un valor escrito a mano** (\`p-[13px]\`). Ese es el número que importa.`);
     L.push('');
+  }
+
+  const { total: pesoTotal, carpetas } = concentracion(d.porArchivo);
+  if (carpetas.length > 1) {
+    L.push('## Dónde se concentra');
+    L.push('');
+    L.push('Los valores sueltos por carpeta, de más a menos. Antes de leer nada más,');
+    L.push('comprueba que estas carpetas son de verdad la interfaz: los tests, las plantillas');
+    L.push('de correo y los tutoriales acumulan valores literales que no son decisiones de');
+    L.push('diseño, y cada uno se llama distinto en cada proyecto. Lo que sobre, fuera con');
+    L.push('`--excluir`.');
+    L.push('');
+    L.push(tabla(
+      ['Carpeta', 'Valores', 'Del total'],
+      carpetas.slice(0, 12).map(([dir, n]) => [
+        `\`${dir}\``, n, `${Math.round((n / pesoTotal) * 100)}%`,
+      ])
+    ));
   }
 
   L.push('## Color');

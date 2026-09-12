@@ -99,12 +99,20 @@ un cliente antes de haber firmado nada.
 --ayuda              esto
 ```
 
-Sobre `--excluir`: las plantillas de correo son el caso habitual. Un cliente de email no
+Sobre `--excluir`: empieza por la tabla «Dónde se concentra» del informe, que te dice qué
+carpetas están inflando las cifras. Las plantillas de correo son el caso habitual. Un cliente de email no
 resuelve variables CSS, así que ahí el literal es obligatorio y contarlo como deuda
 falsea el informe. `--excluir email` las deja fuera. La herramienta no lo hace sola a
 propósito — decidir qué está fuera de alcance es criterio, y el criterio no va dentro.
 
 ## Qué mide
+
+**Dónde se concentra.** Lo primero del informe: cuánta deuda aporta cada carpeta y qué
+porcentaje del total es. En todos los proyectos reales que he probado, buena parte del
+recuento venía de sitios que no son la interfaz — tests, plantillas de correo, tutoriales,
+aplicaciones de ejemplo—. Esas carpetas se llaman distinto en cada proyecto, así que la
+herramienta no puede excluirlas por su cuenta sin ponerse a decidir: las enseña ordenadas
+por peso y tú fijas el alcance con `--excluir`.
 
 **Color.** Normaliza antes de contar: `#fff`, `#FFFFFF`, `rgb(255,255,255)` y `white` son
 el mismo valor. Agrupa los casi idénticos midiendo la distancia en **Lab**, no en RGB —

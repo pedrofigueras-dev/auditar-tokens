@@ -87,6 +87,7 @@ async function main() {
     clasesUsadas: new Map(),
     prefijosDinamicos: new Set(),
     anidados: { selectores: 0, archivos: new Set() },
+    porArchivo: new Map(),
   };
 
   // Una copia de `styles.css` en `www/` duplica cada recuento. Contar dos veces
@@ -121,6 +122,12 @@ async function main() {
       info.contextos[contexto]++;
       info.brutos.add(bruto.toLowerCase());
       info.archivos.set(archivo.ruta, (info.archivos.get(archivo.ruta) || 0) + 1);
+    }
+
+    // Peso de cada archivo en el informe: lo que aporta de deuda, no de contenido.
+    const sueltosAqui = r.colores.filter((c) => c.contexto === 'suelto').length;
+    if (sueltosAqui + r.medidas.length) {
+      datos.porArchivo.set(archivo.ruta, sueltosAqui + r.medidas.length);
     }
 
     for (const { familia, valor } of r.medidas) {
