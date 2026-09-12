@@ -11,6 +11,7 @@ import { resolve, basename } from 'node:path';
 import { recorrer } from '../src/recorrer.mjs';
 import { extraer } from '../src/extraer.mjs';
 import { analizarColor, aHex, agruparColores } from '../src/color.mjs';
+import { censar } from '../src/componentes.mjs';
 import { generarInforme } from '../src/informe.mjs';
 
 const AYUDA = `
@@ -79,6 +80,8 @@ async function main() {
     escala: { literales: 0, conVariable: 0, utilidades: 0 },
     declaraciones: { conVariable: 0, literales: 0 },
     duplicados: [],
+    clasesDeclaradas: new Map(),
+    clasesUsadas: new Map(),
   };
 
   // Una copia de `styles.css` en `www/` duplica cada recuento. Contar dos veces
@@ -124,6 +127,14 @@ async function main() {
       datos.utilidadesColor.set(u, (datos.utilidadesColor.get(u) || 0) + 1);
     }
 
+    for (const c of r.clasesDeclaradas) {
+      let info = datos.clasesDeclaradas.get(c);
+      if (!info) datos.clasesDeclaradas.set(c, (info = { reglas: 0, archivos: new Map() }));
+      info.reglas++;
+      info.archivos.set(archivo.ruta, (info.archivos.get(archivo.ruta) || 0) + 1);
+    }
+    for (const c of r.clasesUsadas) contarEn(datos.clasesUsadas, c, archivo.ruta);
+
     datos.escala.literales += r.escala.literales;
     datos.escala.conVariable += r.escala.conVariable;
     datos.escala.utilidades += r.escala.utilidades;
@@ -137,6 +148,7 @@ async function main() {
   }
 
   datos.grupos = agruparColores([...datos.colores.values()], op.umbral);
+  datos.censo = censar(datos.clasesDeclaradas, datos.clasesUsadas);
 
   if (op.json) {
     const plano = {
@@ -152,6 +164,12 @@ async function main() {
         f, [...v].map(([valor, i]) => ({ valor, usos: i.veces })).sort((a, b) => b.usos - a.usos),
       ])),
       utilidadesColor: Object.fromEntries([...datos.utilidadesColor].sort((a, b) => b[1] - a[1])),
+      componentes: datos.censo.familias.map((f) => ({
+        familia: f.nombre, variantes: f.variantes, reglas: f.reglas, usos: f.usos,
+        plantillas: f.plantillas.size,
+      })),
+      clasesMuertas: datos.censo.muertas,
+      clasesSinDeclarar: datos.censo.sinDeclarar.map(([n, i]) => ({ clase: n, usos: i.veces })),
     };
     const texto = JSON.stringify(plano, null, 2);
     if (op.salida) await writeFile(op.salida, texto + '\n');

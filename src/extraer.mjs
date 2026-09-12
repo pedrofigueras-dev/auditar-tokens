@@ -5,6 +5,15 @@
 
 import { RE_COLOR, analizarColor } from './color.mjs';
 
+// El selector es lo que hay delante de cada `{`; así no se confunde un `.5rem`
+// dentro de una declaración con una clase.
+const RE_SELECTOR = /([^{}@;]+)\{/g;
+const RE_CLASE_CSS = /\.(-?[_a-zA-Z][\w-]*)/g;
+const RE_ATRIBUTO_CLASE = /\bclass(?:Name)?\s*=\s*(["'])([\s\S]*?)\1/g;
+const RE_BLOQUE_ESTILO = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+// Lo que interpola la plantilla no es un nombre de clase.
+const RE_INTERPOLACION = /\{\{[\s\S]*?\}\}|\{%[\s\S]*?%\}|\$\{[\s\S]*?\}/g;
+
 const RE_DECLARACION = /(-{0,2}[a-zA-Z][-a-zA-Z0-9]*)\s*:\s*([^;{}]+)/g;
 const RE_PLANTILLA = /`([^`\\]*(?:\\.[^`\\]*)*)`/g;
 const RE_ESTILO_INLINE = /style\s*=\s*["']([^"']+)["']/gi;
@@ -94,6 +103,21 @@ function leerDeclaraciones(css, salida) {
   }
 }
 
+function leerClasesDeclaradas(css, salida) {
+  for (const m of css.matchAll(RE_SELECTOR)) {
+    for (const c of m[1].matchAll(RE_CLASE_CSS)) salida.clasesDeclaradas.push(c[1]);
+  }
+}
+
+function leerClasesUsadas(texto, salida) {
+  for (const m of texto.matchAll(RE_ATRIBUTO_CLASE)) {
+    const limpio = m[2].replace(RE_INTERPOLACION, ' ');
+    for (const c of limpio.split(/\s+/)) {
+      if (/^-?[_a-zA-Z][\w-]*$/.test(c)) salida.clasesUsadas.push(c);
+    }
+  }
+}
+
 function leerArbitrarios(texto, salida) {
   for (const m of texto.matchAll(RE_ARBITRARIO)) {
     const [, prefijo, bruto] = m;
@@ -144,6 +168,8 @@ export function extraer(texto, tipo) {
     utilidadesColor: [],
     escala: { literales: 0, conVariable: 0, utilidades: 0 },
     declaraciones: { conVariable: 0, literales: 0 },
+    clasesDeclaradas: [],
+    clasesUsadas: [],
   };
 
   for (const m of texto.matchAll(RE_COLOR)) {
@@ -152,7 +178,14 @@ export function extraer(texto, tipo) {
 
   if (tipo === 'estilos') {
     leerDeclaraciones(texto, salida);
+    leerClasesDeclaradas(texto, salida);
   } else if (tipo === 'codigo') {
+    // Un `.vue`, un `.svelte` o una plantilla con <style> llevan el CSS dentro.
+    for (const m of texto.matchAll(RE_BLOQUE_ESTILO)) {
+      leerDeclaraciones(m[1], salida);
+      leerClasesDeclaradas(m[1], salida);
+    }
+    leerClasesUsadas(texto, salida);
     // CSS-in-JS: sólo las plantillas que parecen declaraciones, no cualquier cadena.
     for (const m of texto.matchAll(RE_PLANTILLA)) {
       if (m[1].includes(':') && m[1].includes(';')) leerDeclaraciones(m[1], salida);

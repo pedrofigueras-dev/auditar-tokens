@@ -43,6 +43,15 @@ cuenta como trabajo pendiente lo que está suelto en una regla o en un component
 sale de la escala de Tailwind precisamente para consumir un token. Contarlo como
 decisión suelta invierte el diagnóstico. `p-[13px]` sí cuenta.
 
+**Censa los componentes.** Agrupa las clases del CSS en familias —`.btn`, `.btn--ghost`
+y `.btn__icon` son una sola cosa— y dice cuántas variantes tiene cada una, cuánto CSS
+pesa y en cuántas plantillas aparece. Aparte, lo declarado que nadie usa y lo usado que
+nadie declaró.
+
+**Mide el salto de la escala tipográfica.** Una escala se reconoce por la distancia
+entre pasos, no por la lista de tamaños: si los saltos son ×1.02 y ×1.03, no hay escala,
+hay tamaños añadidos de uno en uno.
+
 **Ignora copias idénticas.** Un `styles.css` duplicado en `www/` dobla todas las cifras
 del informe.
 
