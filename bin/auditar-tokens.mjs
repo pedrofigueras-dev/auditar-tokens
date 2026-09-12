@@ -86,6 +86,7 @@ async function main() {
     clasesDeclaradas: new Map(),
     clasesUsadas: new Map(),
     prefijosDinamicos: new Set(),
+    anidados: { selectores: 0, archivos: new Set() },
   };
 
   // Una copia de `styles.css` en `www/` duplica cada recuento. Contar dos veces
@@ -139,6 +140,10 @@ async function main() {
     }
     for (const c of r.clasesUsadas) contarEn(datos.clasesUsadas, c, archivo.ruta);
     for (const c of r.prefijosDinamicos) datos.prefijosDinamicos.add(c);
+    if (r.anidados) {
+      datos.anidados.selectores += r.anidados;
+      datos.anidados.archivos.add(archivo.ruta);
+    }
 
     datos.escala.literales += r.escala.literales;
     datos.escala.conVariable += r.escala.conVariable;

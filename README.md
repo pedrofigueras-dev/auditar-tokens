@@ -150,8 +150,13 @@ En un proyecto con Tailwind la mayor parte del diseño vive en los `className`, 
 
 ## Qué no mira
 
-`node_modules`, carpetas de build, archivos minificados o generados, y todo lo que se
-componga en tiempo de ejecución: un color concatenado en JavaScript no aparece.
+`node_modules`, carpetas de build, archivos minificados o generados, las carpetas de
+tests (`test`, `spec`, `__tests__`, `cypress`, `fixtures`…) y todo lo que se componga en
+tiempo de ejecución: un color concatenado en JavaScript no aparece.
+
+Los tests quedan fuera por la misma razón que `node_modules`: un fixture que repite
+`color: #ff0000` doscientas veces no es una decisión de diseño. En un monorepo real eso
+era el color más usado del proyecto entero.
 
 Puede sobrecontar: un selector de id como `#abcdef` es indistinguible de un color para
 una expresión regular. Los valores que salen una sola vez conviene mirarlos antes de
@@ -159,6 +164,13 @@ darlos por buenos.
 
 Y puede señalar como muerta una clase que pone JavaScript en tiempo de ejecución. El
 informe lo advierte donde toca: es una sospecha, no una sentencia.
+
+**El anidamiento de SCSS con `&` es el punto ciego conocido.** En `.btn { &--ghost { } }`
+el nombre `btn--ghost` no llega a escribirse nunca: se compone al compilar, y resolverlo
+pide un parser de SCSS, no una expresión regular. El censo de componentes no ve esas
+variantes. Cuando las detecta, el informe abre la sección con un aviso diciendo cuántos
+selectores y cuántos archivos quedan sin contar, para que no te fíes de esa cifra. El
+recuento de color y de medidas no se ve afectado.
 
 ## Sólo lee
 

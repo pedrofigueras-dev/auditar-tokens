@@ -174,6 +174,16 @@ export function generarInforme(d) {
   L.push('Qué objetos de interfaz existen, según las clases que declara el CSS. Una familia');
   L.push('con muchas variantes es un componente que creció sin que nadie lo mirara entero.');
   L.push('');
+  if (d.anidados.selectores) {
+    L.push(
+      `> **Este censo está incompleto.** ${d.anidados.selectores} selectores de ` +
+      `${d.anidados.archivos.size} archivos se anidan con \`&\` —\`.btn { &--ghost { } }\`—, ` +
+      'y ahí el nombre de la clase no llega a escribirse: se compone al compilar. Las ' +
+      'variantes declaradas así no aparecen abajo, y algunas de las clases marcadas como ' +
+      'sin declarar sí lo están.'
+    );
+    L.push('');
+  }
   const conVariantes = censo.familias.filter((f) => f.variantes.length > 1);
   L.push(
     `**${censo.familias.length} familias de clase**, de las cuales ${conVariantes.length} ` +

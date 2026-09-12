@@ -7,6 +7,10 @@ const DIRECTORIOS_IGNORADOS = new Set([
   'node_modules', '.git', '.next', '.nuxt', '.svelte-kit', '.turbo', '.cache', '.parcel-cache',
   'dist', 'build', 'out', 'coverage', 'vendor', 'target', '.venv', 'venv', '__pycache__',
   'storybook-static', '.output', '.vercel', '.netlify', 'ios', 'android',
+  // Un fixture con `color: #ff0000` repetido 263 veces no es una decisión de
+  // diseño. Va con node_modules, no con el código de la interfaz.
+  'test', 'tests', '__tests__', '__mocks__', 'spec', 'specs', 'e2e', 'cypress',
+  'fixtures', '__snapshots__',
 ]);
 
 const ESTILOS = new Set(['.css', '.scss', '.sass', '.less', '.styl', '.pcss']);

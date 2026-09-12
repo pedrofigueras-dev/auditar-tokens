@@ -114,6 +114,10 @@ function leerClasesDeclaradas(bruto, salida) {
   const css = sinComentarios(bruto);
   for (const m of css.matchAll(RE_SELECTOR)) {
     for (const c of m[1].matchAll(RE_CLASE_CSS)) salida.clasesDeclaradas.push(c[1]);
+    // `.btn { &--ghost { } }` nunca escribe `btn--ghost`: el nombre se compone
+    // al compilar. Resolverlo pide un parser de verdad, así que aquí sólo se
+    // cuenta para poder advertir de que el censo está incompleto.
+    if (/(^|,)\s*&/.test(m[1])) salida.anidados++;
   }
 }
 
@@ -184,6 +188,7 @@ export function extraer(texto, tipo) {
     clasesDeclaradas: [],
     clasesUsadas: [],
     prefijosDinamicos: [],
+    anidados: 0,
   };
 
   for (const m of texto.matchAll(RE_COLOR)) {
