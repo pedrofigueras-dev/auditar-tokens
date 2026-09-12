@@ -1,0 +1,13 @@
+{
+  "name": "auditar-tokens",
+  "version": "0.1.0",
+  "description": "Cuenta los valores de diseño literales de un proyecto ya escrito y los agrupa en los tokens que quieren ser.",
+  "type": "module",
+  "bin": { "auditar-tokens": "./bin/auditar-tokens.mjs" },
+  "engines": { "node": ">=18" },
+  "license": "MIT",
+  "files": ["bin", "src", "README.md"],
+  "scripts": {
+    "auditar": "node bin/auditar-tokens.mjs"
+  }
+}
