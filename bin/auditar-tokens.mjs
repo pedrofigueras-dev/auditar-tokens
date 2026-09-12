@@ -82,6 +82,7 @@ async function main() {
     duplicados: [],
     clasesDeclaradas: new Map(),
     clasesUsadas: new Map(),
+    prefijosDinamicos: new Set(),
   };
 
   // Una copia de `styles.css` en `www/` duplica cada recuento. Contar dos veces
@@ -134,6 +135,7 @@ async function main() {
       info.archivos.set(archivo.ruta, (info.archivos.get(archivo.ruta) || 0) + 1);
     }
     for (const c of r.clasesUsadas) contarEn(datos.clasesUsadas, c, archivo.ruta);
+    for (const c of r.prefijosDinamicos) datos.prefijosDinamicos.add(c);
 
     datos.escala.literales += r.escala.literales;
     datos.escala.conVariable += r.escala.conVariable;
@@ -148,7 +150,7 @@ async function main() {
   }
 
   datos.grupos = agruparColores([...datos.colores.values()], op.umbral);
-  datos.censo = censar(datos.clasesDeclaradas, datos.clasesUsadas);
+  datos.censo = censar(datos.clasesDeclaradas, datos.clasesUsadas, datos.prefijosDinamicos);
 
   if (op.json) {
     const plano = {

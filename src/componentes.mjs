@@ -29,7 +29,7 @@ function familiaDe(nombre, raices, segmentos) {
   return segmentos.get(primero) > 1 ? primero : nombre;
 }
 
-export function censar(declaradas, usadas) {
+export function censar(declaradas, usadas, prefijosDinamicos = new Set()) {
   const raices = new Set(declaradas.keys());
   const segmentos = new Map();
   for (const nombre of raices) {
@@ -60,6 +60,7 @@ export function censar(declaradas, usadas) {
   // ponga JavaScript en tiempo de ejecución. Es una sospecha, no una sentencia.
   const muertas = [...declaradas.keys()]
     .filter((n) => !usadas.has(n))
+    .filter((n) => ![...prefijosDinamicos].some((p) => n.startsWith(p) && n !== p))
     .sort();
 
   // Al revés, lo usado sin declarar suele ser la utilidad de un framework —en un

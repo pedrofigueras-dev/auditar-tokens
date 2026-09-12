@@ -87,7 +87,14 @@ function valoresDe(familia, valor) {
   return /^0$/.test(v) ? ['0'] : [];
 }
 
-function leerDeclaraciones(css, salida) {
+// Un comentario que menciona `app.css` deja un `.css` donde el extractor espera
+// un selector, y la clase falsa acaba en la lista de código muerto.
+function sinComentarios(css) {
+  return css.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|\s)\/\/[^\n]*/g, '$1 ');
+}
+
+function leerDeclaraciones(bruto, salida) {
+  const css = sinComentarios(bruto);
   for (const m of css.matchAll(RE_DECLARACION)) {
     const [, prop, valor] = m;
     const familia = familiaDePropiedad(prop);
@@ -103,7 +110,8 @@ function leerDeclaraciones(css, salida) {
   }
 }
 
-function leerClasesDeclaradas(css, salida) {
+function leerClasesDeclaradas(bruto, salida) {
+  const css = sinComentarios(bruto);
   for (const m of css.matchAll(RE_SELECTOR)) {
     for (const c of m[1].matchAll(RE_CLASE_CSS)) salida.clasesDeclaradas.push(c[1]);
   }
@@ -113,7 +121,12 @@ function leerClasesUsadas(texto, salida) {
   for (const m of texto.matchAll(RE_ATRIBUTO_CLASE)) {
     const limpio = m[2].replace(RE_INTERPOLACION, ' ');
     for (const c of limpio.split(/\s+/)) {
-      if (/^-?[_a-zA-Z][\w-]*$/.test(c)) salida.clasesUsadas.push(c);
+      if (!/^-?[_a-zA-Z][\w-]*$/.test(c)) continue;
+      // `class="transcript__line--{{ speaker }}"` deja `transcript__line--` al
+      // quitar la interpolación: no es una clase, es el prefijo de varias que se
+      // componen en tiempo de render. Sus variantes existen aunque no se escriban.
+      if (/[-_]$/.test(c)) salida.prefijosDinamicos.push(c);
+      else salida.clasesUsadas.push(c);
     }
   }
 }
@@ -170,6 +183,7 @@ export function extraer(texto, tipo) {
     declaraciones: { conVariable: 0, literales: 0 },
     clasesDeclaradas: [],
     clasesUsadas: [],
+    prefijosDinamicos: [],
   };
 
   for (const m of texto.matchAll(RE_COLOR)) {
