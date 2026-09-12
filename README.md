@@ -1,5 +1,7 @@
 # auditar-tokens
 
+[![test](https://github.com/pedrofigueras-dev/auditar-tokens/actions/workflows/test.yml/badge.svg)](https://github.com/pedrofigueras-dev/auditar-tokens/actions/workflows/test.yml)
+
 Cuenta los valores de diseño literales de un proyecto ya escrito y los agrupa en los
 tokens que quieren ser.
 
