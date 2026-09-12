@@ -139,19 +139,24 @@ export function generarInforme(d) {
     const valores = d.medidas.get(familia);
     if (!valores) continue;
     for (const [v, info] of valores) {
-      const m = v.match(/^(\d*\.?\d+)px$/);
-      if (m && parseFloat(m[1]) % 4 !== 0) fuera.push([familia, v, info]);
+      // Un proyecto que espacia en `rem` está igual de dentro o de fuera de la
+      // rejilla que uno que lo hace en `px`: hay que convertir para verlo.
+      const m = v.match(/^(\d*\.?\d+)(px|rem|em)$/);
+      if (!m) continue;
+      const px = m[2] === 'px' ? parseFloat(m[1]) : parseFloat(m[1]) * 16;
+      if (px % 4 !== 0) fuera.push([familia, v, px, info]);
     }
   }
-  fuera.sort((a, b) => b[2].veces - a[2].veces);
+  fuera.sort((a, b) => b[3].veces - a[3].veces);
   L.push(`### Espaciados fuera de la rejilla de 4 · ${fuera.length}`);
   L.push('');
   L.push('No es un error por sí mismo, pero un `13px` entre múltiplos de 4 suele ser un ajuste');
-  L.push('a ojo para tapar otra cosa.');
+  L.push('a ojo para tapar otra cosa. Los `rem` se convierten a 16px por unidad.');
   L.push('');
   L.push(tabla(
-    ['Familia', 'Valor', 'Usos', 'Dónde'],
-    fuera.slice(0, TOPE_FILAS).map(([f, v, info]) => [f, `\`${v}\``, info.veces, principales(info.archivos)])
+    ['Familia', 'Valor', 'Equivale a', 'Usos', 'Dónde'],
+    fuera.slice(0, TOPE_FILAS).map(([f, v, px, info]) =>
+      [f, `\`${v}\``, `${+px.toFixed(2)}px`, info.veces, principales(info.archivos)])
   ));
   L.push(recorte(fuera.length, Math.min(TOPE_FILAS, fuera.length)));
 
