@@ -72,6 +72,9 @@ async function main() {
   const raiz = resolve(op.ruta);
   const datos = {
     raiz,
+    // Sólo el nombre de la carpeta: el informe acaba en manos del cliente y su
+    // ruta absoluta enseña la estructura de quien audita, que no es asunto suyo.
+    proyecto: basename(raiz) || raiz,
     umbral: op.umbral,
     archivos: 0,
     colores: new Map(),

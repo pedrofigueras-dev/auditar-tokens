@@ -61,7 +61,7 @@ export function generarInforme(d) {
 
   L.push(`# Auditoría de valores de diseño`);
   L.push('');
-  L.push(`**Proyecto:** \`${d.raiz}\`  `);
+  L.push(`**Proyecto:** \`${d.proyecto}\`  `);
   L.push(`**Fecha:** ${new Date().toISOString().slice(0, 10)}  `);
   L.push(`**Archivos analizados:** ${d.archivos}` +
     (d.duplicados.length ? ` (${d.duplicados.length} copias idénticas ignoradas)` : ''));

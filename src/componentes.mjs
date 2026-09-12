@@ -5,20 +5,24 @@
 const SEPARADORES = /(__|--|-)/;
 
 /**
- * La familia de una clase es el prefijo declarado más largo del que cuelga.
- * `.btn` existe y `.btn-primary` empieza por `btn-`, luego son la misma familia.
- * Si no hay raíz declarada, se cae al primer segmento: `lesson-card` sin `.lesson`
- * se agrupa por `lesson`, que es lo que un humano haría leyendo la hoja.
+ * La familia de una clase es el prefijo declarado más **corto** del que cuelga.
+ * Con el más largo, `.nav__link--activo` se iría a `.nav__link` y el componente
+ * quedaría partido en dos familias; con el más corto, todo el bloque cae en
+ * `.nav`, que es el objeto de interfaz que interesa contar.
+ *
+ * Si no hay raíz declarada, se cae al primer segmento: `lesson-card` sin
+ * `.lesson` se agrupa por `lesson`, que es lo que haría un humano leyendo la
+ * hoja — pero sólo si hay alguien más que comparta ese segmento, para no
+ * inventar una familia `.help` a una clase que se llama `help-fab`.
  */
 function familiaDe(nombre, raices, segmentos) {
   let mejor = null;
   for (const raiz of raices) {
-    // Toda clase está en `raices`, así que la raíz de sí misma no cuenta: lo que
-    // se busca es un prefijo declarado más corto del que ésta cuelgue.
+    // Toda clase está en `raices`, así que la raíz de sí misma no cuenta.
     if (raiz === nombre || nombre.length <= raiz.length) continue;
     if (!nombre.startsWith(raiz)) continue;
     if (!/^(__|--|-)/.test(nombre.slice(raiz.length))) continue;
-    if (!mejor || raiz.length > mejor.length) mejor = raiz;
+    if (!mejor || raiz.length < mejor.length) mejor = raiz;
   }
   if (mejor) return mejor;
 
@@ -36,10 +40,28 @@ export function censar(declaradas, usadas, prefijosDinamicos = new Set()) {
     const primero = nombre.split(SEPARADORES)[0];
     segmentos.set(primero, (segmentos.get(primero) || 0) + 1);
   }
+  // La familia directa puede ser a su vez hija de otra: `panel-lateral__titulo`
+  // cuelga de `panel-lateral`, que cuelga de `panel`. Se sigue la cadena hasta
+  // que deja de moverse, para que el bloque entero acabe en una sola familia.
+  const directa = new Map();
+  for (const nombre of raices) directa.set(nombre, familiaDe(nombre, raices, segmentos));
+  const resuelta = new Map();
+  for (const nombre of raices) {
+    let actual = nombre;
+    const visitados = new Set([actual]);
+    while (true) {
+      const siguiente = directa.get(actual);
+      if (!siguiente || siguiente === actual || visitados.has(siguiente)) break;
+      visitados.add(siguiente);
+      actual = siguiente;
+    }
+    resuelta.set(nombre, actual);
+  }
+
   const familias = new Map();
 
   for (const [nombre, info] of declaradas) {
-    const familia = familiaDe(nombre, raices, segmentos);
+    const familia = resuelta.get(nombre);
     let f = familias.get(familia);
     if (!f) {
       f = { nombre: familia, variantes: [], reglas: 0, usos: 0, plantillas: new Set() };

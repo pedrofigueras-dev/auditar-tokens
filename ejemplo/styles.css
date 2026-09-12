@@ -1,0 +1,79 @@
+/* Mirlo — hoja principal. Las utilidades sueltas están en extras.css. */
+
+:root {
+  --texto: #23252e;
+  --texto-suave: #5f6470;
+  --fondo: #ffffff;
+  --tarjeta: #fefeff;          /* a dos unidades del blanco: nadie los distingue */
+  --borde: #dcdfe6;
+  --acento: #2f6b63;
+  --acento-oscuro: #24544e;
+  --peligro: #b3423c;
+  --exito: #2f7a52;
+  --aviso: #8a6a12;
+  --radio: 6px;
+}
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.nav {
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--borde);
+  background: #ffffff;
+}
+.nav__link { color: #5f6470; font-size: 0.86rem; padding: 0.3rem 0.6rem; }
+.nav__link--activo { color: #2f6b63; font-weight: 600; }
+
+.btn {
+  font-size: 0.88rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radio);
+  border: 1px solid transparent;
+  background: #2f6b63;
+  color: #ffffff;
+}
+.btn--fantasma { background: transparent; border-color: #dcdfe6; color: #23252e; }
+.btn--peligro { background: #b3423c; }
+.btn--grande { font-size: 1.05rem; padding: 0.8rem 1.6rem; }
+.btn--diminuto { font-size: 0.78rem; padding: 0.3rem 0.7rem; }
+.btn__icono { width: 14px; height: 14px; margin-right: 0.4rem; }
+
+.card {
+  background: #fefeff;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  padding: 1.1rem;
+  margin-bottom: 0.9rem;
+}
+.card__titulo { font-size: 1.02rem; margin-bottom: 0.6rem; }
+.card__pie { font-size: 0.82rem; color: #5f6470; margin-top: 0.7rem; }
+.card--elevada { box-shadow: 0 2px 8px rgba(35, 37, 46, .08); }
+.card--plana { box-shadow: none; border-color: #dadde4; }
+
+.pill {
+  font-size: 0.74rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  background: #eef1f0;
+}
+.pill--ok { background: #e4f0ea; color: var(--exito); }
+.pill--mal { background: #f6e6e5; color: #b3423c; }
+
+.tabla { font-size: 0.9rem; width: 100%; }
+.tabla__alerta { color: var(--aviso); font-size: 0.8rem; }
+.tabla th { font-size: 0.76rem; color: #5f6470; padding: 0.5rem 0.9rem; }
+.tabla td { padding: 0.65rem 0.9rem; border-bottom: 1px solid #dcdfe6; }
+
+.panel-lateral { width: 17rem; padding: 1.3rem; background: #f7f8fa; }
+.panel-lateral__titulo { font-size: 0.92rem; margin-bottom: 0.9rem; }
+
+.aviso { padding: 0.9rem 1.1rem; border-radius: 6px; font-size: 0.87rem; }
+.aviso--info { background: #393940; color: #ffffff; }
+.aviso--grave { background: #3a3a3f; color: #ffffff; }
