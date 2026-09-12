@@ -10,6 +10,7 @@
   "keywords": ["design-system", "design-tokens", "css", "audit", "static-analysis", "cli"],
   "repository": { "type": "git", "url": "git+https://github.com/pedrofigueras-dev/auditar-tokens.git" },
   "scripts": {
-    "auditar": "node bin/auditar-tokens.mjs"
+    "auditar": "node bin/auditar-tokens.mjs",
+    "test": "node --test"
   }
 }

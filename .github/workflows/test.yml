@@ -1,0 +1,28 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['18', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node --test
+
+      # El informe del ejemplo está versionado: si el código cambia y nadie lo
+      # regenera, el repositorio enseña una salida que ya no es la que produce.
+      # La fecha se descarta del cotejo porque cambia cada día por sí sola.
+      - name: el informe del ejemplo sigue al día
+        run: |
+          node bin/auditar-tokens.mjs ejemplo --salida /tmp/nuevo.md
+          diff <(grep -v '^\*\*Fecha:' ejemplo/auditoria.md) \
+               <(grep -v '^\*\*Fecha:' /tmp/nuevo.md)

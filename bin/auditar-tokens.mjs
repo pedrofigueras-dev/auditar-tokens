@@ -5,7 +5,7 @@
 // Es el paso 1 de un retrofit de design system: antes de proponer primitivos hay
 // que saber cuántos hay. Sólo lee.
 
-import { writeFile } from 'node:fs/promises';
+import { writeFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { resolve, basename } from 'node:path';
 import { recorrer } from '../src/recorrer.mjs';
@@ -70,6 +70,19 @@ async function main() {
   }
 
   const raiz = resolve(op.ruta);
+  // Una ruta mal escrita y un proyecto sin estilos daban el mismo mensaje, y no
+  // son el mismo problema.
+  try {
+    const info = await stat(raiz);
+    if (!info.isDirectory()) {
+      console.error(`${raiz} no es una carpeta. Apunta a la raíz del proyecto.`);
+      process.exit(2);
+    }
+  } catch {
+    console.error(`No existe la carpeta ${raiz}`);
+    process.exit(2);
+  }
+
   const datos = {
     raiz,
     // Sólo el nombre de la carpeta: el informe acaba en manos del cliente y su

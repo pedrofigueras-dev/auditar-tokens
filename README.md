@@ -185,6 +185,18 @@ variantes. Cuando las detecta, el informe abre la sección con un aviso diciendo
 selectores y cuántos archivos quedan sin contar, para que no te fíes de esa cifra. El
 recuento de color y de medidas no se ve afectado.
 
+## Pruebas
+
+```bash
+npm test    # o: node --test
+```
+
+Veintiuna pruebas sin dependencias, con el corredor que trae Node. Cada una guarda una
+corrección que salió de auditar un proyecto real: que `px-[var(--x)]` no es deuda, que un
+comentario que nombra un archivo no inventa una clase, que el CSS de dentro de una valla
+de código es un ejemplo y no diseño. No están para cubrir líneas; están para que esos
+falsos positivos no vuelvan en silencio.
+
 ## Sólo lee
 
 No escribe, no instala y no modifica el proyecto auditado. Lo único que crea es el
